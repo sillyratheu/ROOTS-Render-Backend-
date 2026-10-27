@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="space-y-8">
+    <div class="flex justify-between items-center bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">Teacher Control Dashboard</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Manage student approvals, progress, courses, and announcements.</p>
+        </div>
+        <a href="{{ url_for('teacher_logout') }}" class="bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs px-4 py-2 rounded-xl font-semibold transition">Logout</a>
+    </div>
+
+    <!-- Upload Course / Sheet with Photo & PDF -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h2 class="text-lg font-bold text-slate-900">📤 Upload Course Module & PDF Sheet</h2>
+        <form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input type="hidden" name="action" value="add_course">
+            <input type="text" name="title" placeholder="Course / Sheet Title (e.g. Spoken Sheet 1)" required class="border rounded-xl px-4 py-2.5 text-sm">
+            <input type="text" name="batch_tag" placeholder="Batch Tag (e.g. SSC 2026 Batch)" required class="border rounded-xl px-4 py-2.5 text-sm">
+            <input type="text" name="photo" placeholder="Course Image URL (Photo link)" required class="border rounded-xl px-4 py-2.5 text-sm">
+            <input type="text" name="pdf" placeholder="PDF File Link (Download Link)" required class="border rounded-xl px-4 py-2.5 text-sm">
+            <textarea name="desc" placeholder="Short Course Description" required class="md:col-span-2 border rounded-xl px-4 py-2.5 text-sm"></textarea>
+            <button type="submit" class="md:col-span-2 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium py-2.5 rounded-xl transition shadow">Publish Course</button>
+        </form>
+    </div>
+
+    <!-- Post Announcement -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h2 class="text-lg font-bold text-slate-900">📢 Post Announcement</h2>
+        <form method="POST" class="flex gap-4">
+            <input type="hidden" name="action" value="add_announcement">
+            <input type="text" name="message" placeholder="Write announcement notice..." required class="flex-grow border rounded-xl px-4 py-2.5 text-sm">
+            <button type="submit" class="bg-slate-900 text-white text-xs px-6 py-2.5 rounded-xl font-semibold shadow">Post</button>
+        </form>
+    </div>
+
+    <!-- Student Management Table -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm overflow-x-auto space-y-4">
+        <h2 class="text-lg font-bold text-slate-900">👥 Student Management & Progress Control</h2>
+        <table class="w-full text-left text-xs">
+            <thead>
+                <tr class="border-b text-slate-400 pb-2">
+                    <th class="pb-3">Name</th>
+                    <th class="pb-3">Email</th>
+                    <th class="pb-3">Class</th>
+                    <th class="pb-3">Status</th>
+                    <th class="pb-3">Progress (%)</th>
+                    <th class="pb-3 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y">
+                {% for student in students %}
+                <tr class="py-3">
+                    <td class="py-3 font-semibold text-slate-900">{{ student[1] }}</td>
+                    <td class="py-3 text-slate-500">{{ student[2] }}</td>
+                    <td class="py-3 text-emerald-800 font-medium">{{ student[3] }}</td>
+                    <td class="py-3">
+                        {% if student[4] == 'pending' %}
+                            <span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full font-medium">Pending</span>
+                        {% else %}
+                            <span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-medium">Approved</span>
+                        {% endif %}
+                    </td>
+                    <td class="py-3">
+                        <form method="POST" class="flex items-center gap-2">
+                            <input type="hidden" name="action" value="update_progress">
+                            <input type="hidden" name="student_id" value="{{ student[0] }}">
+                            <input type="number" name="progress" value="{{ student[5] }}" min="0" max="100" class="w-16 border rounded-lg px-2 py-1 text-xs">
+                            <button type="submit" class="bg-slate-800 text-white px-2 py-1 rounded text-[10px]">Update</button>
+                        </form>
+                    </td>
+                    <td class="py-3 text-right space-x-1">
+                        {% if student[4] == 'pending' %}
+                        <form method="POST" class="inline">
+                            <input type="hidden" name="action" value="approve">
+                            <input type="hidden" name="student_id" value="{{ student[0] }}">
+                            <button type="submit" class="bg-emerald-700 text-white px-3 py-1 rounded-lg">Approve</button>
+                        </form>
+                        {% endif %}
+                        <form method="POST" class="inline" onsubmit="return confirm('Delete this student?');">
+                            <input type="hidden" name="action" value="delete_student">
+                            <input type="hidden" name="student_id" value="{{ student[0] }}">
+                            <button type="submit" class="bg-rose-600 text-white px-3 py-1 rounded-lg">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}
