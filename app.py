@@ -1,14 +1,19 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
+import os
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = "roots_english_institute_secure_secret_key"
+UPLOAD_FOLDER = 'static/uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 def init_db():
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
     
-    # Students Table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS students (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -16,23 +21,21 @@ def init_db():
             email TEXT UNIQUE,
             student_class TEXT,
             status TEXT DEFAULT 'pending',
-            progress INTEGER DEFAULT 10
+            progress INTEGER DEFAULT 15
         )
     ''')
     
-    # Courses / PDF Sheets Table (with Photo & PDF Link)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS courses (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT,
             description TEXT,
-            photo_link TEXT,
-            pdf_link TEXT,
+            photo_filename TEXT,
+            pdf_filename TEXT,
             batch_tag TEXT
         )
     ''')
 
-    # Announcements Table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS announcements (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -47,7 +50,6 @@ def init_db():
 def home():
     return redirect(url_for('dashboard'))
 
-# Dashboard Page (Coursera Style Course Cards & Announcements)
 @app.route('/Dashboard')
 def dashboard():
     conn = sqlite3.connect('database.db')
@@ -59,7 +61,6 @@ def dashboard():
     conn.close()
     return render_template('dashboard.html', courses=courses, announcements=announcements)
 
-# Student Portal & Google Sign-in Flow
 @app.route('/studentpanel', methods=['GET', 'POST'])
 def student_panel():
     student = None
@@ -96,7 +97,6 @@ def student_logout():
     session.pop('student_email', None)
     return redirect(url_for('student_panel'))
 
-# Teacher Panel Login (ID: 123454, Pass: mithu123@teacher)
 @app.route('/teacherpanel', methods=['GET', 'POST'])
 def teacher_panel():
     error = None
@@ -112,7 +112,6 @@ def teacher_panel():
             
     return render_template('teacherpanel.html', error=error)
 
-# Teacher Control Dashboard (Manage Students, Progress, Courses, Announcements)
 @app.route('/teacher/dashboard', methods=['GET', 'POST'])
 def teacher_dashboard():
     if not session.get('is_teacher'):
@@ -127,11 +126,24 @@ def teacher_dashboard():
         if action == 'add_course':
             title = request.form.get('title')
             desc = request.form.get('desc')
-            photo = request.form.get('photo')
-            pdf = request.form.get('pdf')
             tag = request.form.get('tag')
-            cursor.execute("INSERT INTO courses (title, description, photo_link, pdf_link, batch_tag) VALUES (?, ?, ?, ?, ?)", 
-                           (title, desc, photo, pdf, tag))
+            
+            photo_file = request.files.get('photo')
+            pdf_file = request.files.get('pdf')
+            
+            photo_filename = ""
+            pdf_filename = ""
+            
+            if photo_file and photo_file.filename:
+                photo_filename = secure_filename(photo_file.filename)
+                photo_file.save(os.path.join(app.config['UPLOAD_FOLDER'], photo_filename))
+                
+            if pdf_file and pdf_file.filename:
+                pdf_filename = secure_filename(pdf_file.filename)
+                pdf_file.save(os.path.join(app.config['UPLOAD_FOLDER'], pdf_filename))
+                
+            cursor.execute("INSERT INTO courses (title, description, photo_filename, pdf_filename, batch_tag) VALUES (?, ?, ?, ?, ?)", 
+                           (title, desc, photo_filename, pdf_filename, tag))
             conn.commit()
             
         elif action == 'add_announcement':
@@ -175,7 +187,6 @@ def teacher_logout():
     session.pop('is_teacher', None)
     return redirect(url_for('teacher_panel'))
 
-# Info Page
 @app.route('/info')
 def info_page():
     return render_template('info.html')
