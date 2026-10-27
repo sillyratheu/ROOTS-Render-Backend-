@@ -2,7 +2,6 @@
 {% block content %}
 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
     
-    <!-- Left: ROOTS ENGLISH LANGUAGE INSTITUTE-->
     <div class="md:col-span-2 space-y-6">
         <div class="bg-emerald-900 text-white p-6 rounded-2xl shadow-sm">
             <h1 class="text-2xl font-bold mb-1">Welcome to ROOTS Learning Portal</h1>
@@ -19,7 +18,7 @@
                 {% for course in courses %}
                 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition flex flex-col md:flex-row">
                     {% if course[3] %}
-                    <img src="{{ course[3] }}" alt="Course Photo" class="w-full md:w-48 h-40 object-cover">
+                    <img src="{{ url_for('static', filename='uploads/' + course[3]) }}" alt="Course Photo" class="w-full md:w-48 h-40 object-cover">
                     {% endif %}
                     <div class="p-6 flex flex-col justify-between flex-grow">
                         <div>
@@ -32,7 +31,9 @@
                         </div>
                         <div class="pt-4 mt-4 border-t flex justify-between items-center">
                             <span class="text-xs font-semibold text-emerald-700">📚 PDF Module Ready</span>
-                            <a href="{{ course[4] }}" target="_blank" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs px-4 py-2 rounded-xl font-medium shadow transition">Download PDF</a>
+                            {% if course[4] %}
+                            <a href="{{ url_for('static', filename='uploads/' + course[4]) }}" target="_blank" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs px-4 py-2 rounded-xl font-medium shadow transition">Download PDF</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -45,7 +46,6 @@
         {% endif %}
     </div>
 
-    <!-- Right: Announcements Board -->
     <div class="space-y-6">
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
             <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2 text-sm border-b pb-2">
