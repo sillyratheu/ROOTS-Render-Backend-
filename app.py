@@ -3,26 +3,24 @@ from flask import Flask, flash, redirect, render_template, request, session, url
 import sqlite3
 
 app = Flask(__name__)
-app.secret_key = "roots_secret_key_12345"  # সেশন সিকিউরিটির জন্য
+app.secret_key = "roots_english_institute_secret_2026"
 
 
-# ডাটাবেজ ইনিশিয়ালাইজেশন
+# Database Setup (Student, Courses, Referrals)
 def init_db():
   conn = sqlite3.connect("database.db")
   cursor = conn.cursor()
 
-  # স্টুডেন্ট টেবিল
   cursor.execute("""
         CREATE TABLE IF NOT EXISTS students (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
             email TEXT UNIQUE,
-            status TEXT DEFAULT 'pending', -- 'pending' or 'approved'
-            progress INTEGER DEFAULT 0
+            status TEXT DEFAULT 'pending',
+            progress INTEGER DEFAULT 15
         )
     """)
 
-  # কোর্স/শিট টেবিল (বড় চাচা যা আপলোড করবেন)
   cursor.execute("""
         CREATE TABLE IF NOT EXISTS courses (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,7 +30,6 @@ def init_db():
         )
     """)
 
-  # রেফারেল টেবিল
   cursor.execute("""
         CREATE TABLE IF NOT EXISTS referrals (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,9 +43,12 @@ def init_db():
   conn.close()
 
 
-# --- Routes ---
+@app.route("/")
+def home():
+  return redirect(url_for("dashboard"))
 
 
+# Dashboard Route (Course Materials)
 @app.route("/Dashboard")
 def dashboard():
   conn = sqlite3.connect("database.db")
@@ -59,6 +59,7 @@ def dashboard():
   return render_template("dashboard.html", courses=courses)
 
 
+# Student Panel Route
 @app.route("/studentpanel", methods=["GET", "POST"])
 def student_panel():
   student = None
@@ -70,11 +71,10 @@ def student_panel():
     )
     student = cursor.fetchone()
     conn.close()
-
   return render_template("studentpanel.html", student=student)
 
 
-# সিমুলেটেড Google Login / Signup
+# Student Google Login / Create ROOT Account Simulation
 @app.route("/student-login", methods=["POST"])
 def student_login():
   name = request.form.get("name")
@@ -86,10 +86,10 @@ def student_login():
   existing = cursor.fetchone()
 
   if not existing:
-    # নতুন অ্যাকাউন্ট ১ দিনের জন্য 'pending' থাকবে
+    # 1 দিন বা ডিফল্ট পেন্ডিং স্ট্যাটাস
     cursor.execute(
         "INSERT INTO students (name, email, status, progress) VALUES (?, ?,"
-        " 'pending', 10)",
+        " 'pending', 15)",
         (name, email),
     )
     conn.commit()
@@ -105,6 +105,7 @@ def student_logout():
   return redirect(url_for("student_panel"))
 
 
+# Teacher Panel Login (Secret ID & Password)
 @app.route("/teacherpanel", methods=["GET", "POST"])
 def teacher_panel():
   error = None
@@ -112,7 +113,7 @@ def teacher_panel():
     teacher_id = request.form.get("teacher_id")
     password = request.form.get("password")
 
-    # সিক্রেট আইডি ও পাসওয়ার্ড (তুমি আর চাচা জানবে)
+    # শুধু তুমি আর বড় চাচা জানবে
     if teacher_id == "roots_admin" and password == "chacha123":
       session["is_teacher"] = True
       return redirect(url_for("teacher_dashboard"))
@@ -122,6 +123,7 @@ def teacher_panel():
   return render_template("teacherpanel.html", error=error)
 
 
+# Teacher Control Dashboard (Approve, Delete, Upload PDF)
 @app.route("/teacher/dashboard", methods=["GET", "POST"])
 def teacher_dashboard():
   if not session.get("is_teacher"):
@@ -172,6 +174,7 @@ def teacher_logout():
   return redirect(url_for("teacher_panel"))
 
 
+# Info & Refer Page
 @app.route("/info", methods=["GET", "POST"])
 def info_page():
   success = None
@@ -189,7 +192,7 @@ def info_page():
     )
     conn.commit()
     conn.close()
-    success = "Referral submitted successfully! Your reward is on the way."
+    success = "Referral submitted successfully!"
 
   return render_template("info.html", success=success)
 
