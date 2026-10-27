@@ -10,15 +10,15 @@
 
     <!-- Header / Navbar -->
     <header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
             <div class="flex items-center space-x-3">
-                <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="ROOTS Logo" class="h-11 w-11 rounded-full object-cover border-2 border-emerald-700 shadow">
+                <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="ROOTS Logo" class="h-10 w-10 rounded-full object-cover border-2 border-emerald-700 shadow">
                 <div>
-                    <span class="text-xl font-bold tracking-tight text-emerald-900 block leading-tight">ROOTS</span>
-                    <span class="text-xs text-slate-500 font-medium">English Institute</span>
+                    <span class="text-lg font-bold tracking-tight text-emerald-900 block leading-tight">ROOTS English Institute</span>
+                    <span class="text-[11px] text-slate-500 font-medium">Kushtia</span>
                 </div>
             </div>
-            <nav class="space-x-6 text-sm font-semibold">
+            <nav class="flex flex-wrap justify-center gap-4 text-xs sm:text-sm font-semibold">
                 <a href="{{ url_for('dashboard') }}" class="text-slate-600 hover:text-emerald-700 transition">Dashboard</a>
                 <a href="{{ url_for('student_panel') }}" class="text-slate-600 hover:text-emerald-700 transition">Student Panel</a>
                 <a href="{{ url_for('teacher_panel') }}" class="text-slate-600 hover:text-emerald-700 transition">Teacher Panel</a>
