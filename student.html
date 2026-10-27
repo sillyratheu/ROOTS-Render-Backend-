@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROOTS English Institute - Student Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Top Header & Navbar -->
+    <header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <img src="logo.jpg" alt="ROOTS Logo" class="h-12 w-12 rounded-full object-cover border-2 border-emerald-700 shadow">
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight text-emerald-900 leading-tight">ROOTS English Institute</h1>
+                    <span class="text-xs text-slate-500 font-medium">Student Portal</span>
+                </div>
+            </div>
+            <nav class="space-x-6 text-sm font-semibold hidden md:block">
+                <a href="dashboard.html" class="text-slate-600 hover:text-emerald-700 transition">Dashboard</a>
+                <a href="student.html" class="text-emerald-700 border-b-2 border-emerald-700 pb-1">Student Panel</a>
+                <a href="teacher.html" class="text-slate-600 hover:text-emerald-700 transition">Teacher Panel</a>
+                <a href="info.html" class="text-slate-600 hover:text-emerald-700 transition">Info</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Student Portal Content -->
+    <main class="flex-grow max-w-md mx-auto px-4 py-16 w-full flex items-center justify-center">
+        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm w-full text-center space-y-6">
+            
+            <div>
+                <h2 class="text-2xl font-bold text-slate-900">Student Portal</h2>
+                <p class="text-xs text-slate-500 mt-1">Access your courses, materials, and track your learning progress.</p>
+            </div>
+
+            <!-- Class Selection before Google Login -->
+            <div class="space-y-2 text-left">
+                <label class="block text-xs font-semibold text-slate-700">Select Your Class / Batch</label>
+                <select id="studentClass" class="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-700 bg-slate-50 font-medium">
+                    <option value="">-- Choose Your Class --</option>
+                    <option value="Class 6">Class 6</option>
+                    <option value="Class 7">Class 7</option>
+                    <option value="Class 8">Class 8</option>
+                    <option value="Class 9">Class 9</option>
+                    <option value="Class 10">Class 10</option>
+                    <option value="SSC Candidate">SSC Candidate</option>
+                    <option value="HSC Candidate">HSC Candidate</option>
+                </select>
+            </div>
+
+            <!-- Real Google Sign-In Button Style -->
+            <form action="https://roots-render-backend.onrender.com/student-login" method="POST" id="googleLoginForm">
+                <input type="hidden" name="student_class" id="hiddenClass">
+                <input type="hidden" name="email" value="student.google@gmail.com"> <!-- Simulated Google Account Token -->
+                <input type="hidden" name="name" value="ROOTS Student">
+
+                <button type="button" onclick="handleGoogleLogin()" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold py-3 px-4 rounded-xl text-sm transition shadow-sm">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.18v3.15C3.17 21.32 7.23 24 12 24z"/>
+                        <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.18C.43 8.08 0 9.79 0 12s.43 3.92 1.18 5.42l4.1-3.15z"/>
+                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.17 2.68 1.18 6.58l4.1 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                    </svg>
+                    Continue with Google
+                </button>
+            </form>
+
+            <p class="text-[11px] text-slate-400">By continuing, your account will be sent for 1-day instructor approval by Mithu Sir.</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+        &copy; 2026 ROOTS English Institute, Kushtia. All rights reserved.
+    </footer>
+
+    <script>
+        function handleGoogleLogin() {
+            const selectedClass = document.getElementById('studentClass').value;
+            if(!selectedClass) {
+                alert('Please select your class first!');
+                return;
+            }
+            document.getElementById('hiddenClass').value = selectedClass;
+            document.getElementById('googleLoginForm').submit();
+        }
+    </script>
+</body>
+</html>
