@@ -1,6 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
 import os
+from datetime import timedelta
+
+# Session lifetime 30 din porjonto save thakbe
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
+
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
