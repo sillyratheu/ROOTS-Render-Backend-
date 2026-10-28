@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="max-w-xl mx-auto py-8">
+<div class="max-w-xl mx-auto py-8 space-y-6">
     <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
         
         {% if not student %}
@@ -44,7 +44,6 @@
             </form>
         
         {% else %}
-            <!-- Professional Student Dashboard View -->
             <div class="space-y-6">
                 <div class="flex items-center justify-between border-b pb-4">
                     <div>
@@ -95,5 +94,26 @@
         {% endif %}
 
     </div>
+
+    <!-- Class-Specific Notices Board for Logged-in Students -->
+    {% if student and student[4] == 'approved' %}
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+        <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2 border-b pb-2">
+            📢 Notices for {{ student[3] }}
+        </h3>
+        {% if class_announcements %}
+            <ul class="space-y-3 text-xs text-slate-700">
+                {% for notice in class_announcements %}
+                <li class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-emerald-800 uppercase tracking-wide">Target: {{ notice[2] }}</span>
+                    <span>{{ notice[1] }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-xs text-slate-400 italic">No specific notices for your class right now.</p>
+        {% endif %}
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
