@@ -39,7 +39,8 @@ def init_db():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS announcements (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            message TEXT
+            message TEXT,
+            target_class TEXT DEFAULT 'All Classes'
         )
     ''')
     
@@ -64,13 +65,20 @@ def dashboard():
 @app.route('/studentpanel', methods=['GET', 'POST'])
 def student_panel():
     student = None
+    class_announcements = []
     if 'student_email' in session:
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM students WHERE email = ?", (session['student_email'],))
         student = cursor.fetchone()
+        
+        if student:
+            s_class = student[3]
+            cursor.execute("SELECT * FROM announcements WHERE target_class = 'All Classes' OR target_class = ?", (s_class,))
+            class_announcements = cursor.fetchall()
+            
         conn.close()
-    return render_template('student.html', student=student)
+    return render_template('student.html', student=student, class_announcements=class_announcements)
 
 @app.route('/student-login', methods=['POST'])
 def student_login():
@@ -148,7 +156,13 @@ def teacher_dashboard():
             
         elif action == 'add_announcement':
             msg = request.form.get('message')
-            cursor.execute("INSERT INTO announcements (message) VALUES (?)", (msg,))
+            target_class = request.form.get('target_class', 'All Classes')
+            cursor.execute("INSERT INTO announcements (message, target_class) VALUES (?, ?)", (msg, target_class))
+            conn.commit()
+
+        elif action == 'delete_announcement':
+            ann_id = request.form.get('ann_id')
+            cursor.execute("DELETE FROM announcements WHERE id = ?", (ann_id,))
             conn.commit()
 
         elif action == 'approve':
