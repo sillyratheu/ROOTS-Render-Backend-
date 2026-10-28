@@ -2,17 +2,14 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
 import os
 from datetime import timedelta
-
-# Session lifetime 30 din porjonto save thakbe
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
-
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = "roots_english_institute_secure_secret_key"
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
+
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 def init_db():
@@ -118,6 +115,7 @@ def teacher_panel():
         password = request.form.get('password')
         
         if teacher_id == '123454' and password == 'mithu123@teacher':
+            session.permanent = True
             session['is_teacher'] = True
             return redirect(url_for('teacher_dashboard'))
         else:
