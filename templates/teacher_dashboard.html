@@ -39,14 +39,75 @@
         </form>
     </div>
 
-    <!-- Post Announcement -->
+    <!-- Manage Uploaded Courses (Delete Option) -->
     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-        <h2 class="text-lg font-bold text-slate-900">📢 Post Announcement</h2>
-        <form method="POST" class="flex gap-4">
+        <h2 class="text-lg font-bold text-slate-900">📚 Manage Uploaded Courses</h2>
+        {% if courses %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% for course in courses %}
+            <div class="border rounded-xl p-4 flex justify-between items-center bg-slate-50">
+                <div>
+                    <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">{{ course[5] }}</span>
+                    <h4 class="font-bold text-sm text-slate-900 mt-1">{{ course[1] }}</h4>
+                </div>
+                <form method="POST" onsubmit="return confirm('Delete this course?');">
+                    <input type="hidden" name="action" value="delete_course">
+                    <input type="hidden" name="course_id" value="{{ course[0] }}">
+                    <button type="submit" class="bg-rose-600 text-white text-xs px-3 py-1.5 rounded-lg font-medium">Delete</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-xs text-slate-400 italic">No courses uploaded yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- Post Class-Specific Announcement / Notice -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h2 class="text-lg font-bold text-slate-900">📢 Post Notice & Announcement</h2>
+        <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <input type="hidden" name="action" value="add_announcement">
-            <input type="text" name="message" placeholder="Write announcement notice..." required class="flex-grow border rounded-xl px-4 py-2.5 text-sm">
-            <button type="submit" class="bg-slate-900 text-white text-xs px-6 py-2.5 rounded-xl font-semibold shadow">Post</button>
+            <div class="md:col-span-2">
+                <input type="text" name="message" placeholder="Write announcement notice..." required class="w-full border rounded-xl px-4 py-2.5 text-sm">
+            </div>
+            <div>
+                <select name="target_class" class="w-full border rounded-xl px-4 py-2.5 text-sm bg-white">
+                    <option value="All Classes">All Classes (Global)</option>
+                    <option value="Class 6">Class 6</option>
+                    <option value="Class 7">Class 7</option>
+                    <option value="Class 8">Class 8</option>
+                    <option value="Class 9">Class 9</option>
+                    <option value="Class 10">Class 10</option>
+                    <option value="SSC Candidate">SSC Candidate</option>
+                    <option value="HSC Candidate">HSC Candidate</option>
+                </select>
+            </div>
+            <button type="submit" class="md:col-span-3 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold py-2.5 rounded-xl shadow">Publish Notice</button>
         </form>
+
+        <!-- Manage / Delete Announcements -->
+        <div class="pt-4 border-t space-y-2">
+            <h3 class="text-xs font-bold text-slate-700">Existing Notices & Announcements</h3>
+            {% if announcements %}
+                <ul class="space-y-2 text-xs">
+                    {% for ann in announcements %}
+                    <li class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border">
+                        <div>
+                            <span class="font-bold text-emerald-800">[{{ ann[2] }}]:</span> {{ ann[1] }}
+                        </div>
+                        <form method="POST">
+                            <input type="hidden" name="action" value="delete_announcement">
+                            <input type="hidden" name="ann_id" value="{{ ann[0] }}">
+                            <button type="submit" class="bg-rose-600 text-white px-2.5 py-1 rounded text-[10px]">Delete</button>
+                        </form>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-xs text-slate-400 italic">No announcements posted.</p>
+            {% endif %}
+        </div>
     </div>
 
     <!-- Student Management Table -->
@@ -74,7 +135,7 @@
                             <span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full font-medium">Pending</span>
                         {% else %}
                             <span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-medium">Approved</span>
-                        {% endif %}
+                        <% endif %}
                     </td>
                     <td class="py-3">
                         <form method="POST" class="flex items-center gap-2">
